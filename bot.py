@@ -1,4 +1,3 @@
-
 import requests
 import time
 import pandas as pd
@@ -7,12 +6,13 @@ import numpy as np
 print("BOT INICIADO", flush=True)
 
 # CONFIGURAÇÕES
-TOKEN = "8772767472:AAGnnI0tiiHRCnWZvJQHadi8bXtNy64JPgU"
-CHAT_ID = "8729665942"
+TOKEN = "SEU_TOKEN_AQUI"
+CHAT_ID = "SEU_CHAT_ID_AQUI"
 
 symbol = "BTCUSDT"
 interval = "4h"
 rsi_period = 14
+
 
 def send_telegram_message(message):
     url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
@@ -22,10 +22,11 @@ def send_telegram_message(message):
     }
     requests.post(url, data=payload)
 
+
 def get_klines():
     url = "https://api.binance.com/api/v3/klines"
     params = {
-        "symbol": "symbol",
+        "symbol": symbol,  # CORRIGIDO AQUI
         "interval": interval,
         "limit": 100
     }
@@ -33,13 +34,23 @@ def get_klines():
     response = requests.get(url, params=params)
     data = response.json()
 
-    if not data or len(data) == 0:
-        print("⚠ Binance retornou vazio", flush=True)
+    # Se Binance retornar erro
+    if not isinstance(data, list):
+        print("Erro na API:", data, flush=True)
         return []
 
-    closes = [float(candle[4]) for candle in data]
+    closes = []
+    for candle in data:
+        if isinstance(candle, list) and len(candle) > 4:
+            closes.append(float(candle[4]))
+
     return closes
+
+
 def calculate_rsi(closes, period=14):
+    if len(closes) < period:
+        return None
+
     delta = np.diff(closes)
     gain = np.where(delta > 0, delta, 0)
     loss = np.where(delta < 0, -delta, 0)
@@ -52,42 +63,33 @@ def calculate_rsi(closes, period=14):
 
     return rsi.iloc[-1]
 
+
 last_alert = None
 
 while True:
-    print("LOOP ATIVO", flush=True)
-
     try:
+        print("LOOP ATIVO", flush=True)
+
         closes = get_klines()
 
-        # proteção 1
         if not closes:
-            print("Sem dados da Binance", flush=True)
-            time.sleep(60)
-            continue
-
-        # proteção 2
-        if len(closes) < rsi_period:
-            print("Dados insuficientes para RSI", flush=True)
             time.sleep(60)
             continue
 
         rsi = calculate_rsi(closes, rsi_period)
 
-        # proteção 3
-        if pd.isna(rsi):
-            print("RSI ainda não calculável", flush=True)
+        if rsi is None:
             time.sleep(60)
             continue
 
-        print("RSI atual:", rsi, flush=True)
+        print("RSI atual:", round(rsi, 2), flush=True)
 
         levels = [25, 30, 70, 75]
 
         for level in levels:
             if round(rsi) == level and last_alert != level:
                 send_telegram_message(
-                    f"🚨 BTCUSDT atingiu RSI {level} no {interval}!\nRSI atual: {round(rsi,2)}"
+                    f"🚨 BTCUSDT atingiu RSI {level} no {interval}!\nRSI atual: {round(rsi, 2)}"
                 )
                 last_alert = level
 
