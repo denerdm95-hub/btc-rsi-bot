@@ -86,8 +86,6 @@ while True:
 
         print("RSI atual:", round(rsi, 2), flush=True)
 
-# TESTE DE ENVIO
-send_telegram_message(f"✅ TESTE: RSI atual é {round(rsi,2)}")
 
         # Só começa a comparar depois que tiver valor anterior
         if previous_rsi is not None:
