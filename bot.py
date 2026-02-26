@@ -66,6 +66,8 @@ def calculate_rsi(closes, period=14):
 
 last_alert = None
 
+previous_rsi = None
+
 while True:
     try:
         print("LOOP ATIVO", flush=True)
@@ -84,14 +86,34 @@ while True:
 
         print("RSI atual:", round(rsi, 2), flush=True)
 
-        levels = [25, 30, 70, 75]
+        # Só começa a comparar depois que tiver valor anterior
+        if previous_rsi is not None:
 
-        for level in levels:
-            if round(rsi) == level and last_alert != level:
+            # 🔼 Cruzou 70 para cima
+            if previous_rsi < 70 and rsi >= 70:
                 send_telegram_message(
-                    f"🚨 BTCUSDT atingiu RSI {level} no {interval}!\nRSI atual: {round(rsi, 2)}"
+                    f"🚨 BTCUSDT entrou em SOBRECOMPRA!\nRSI cruzou 70\nAtual: {round(rsi,2)}"
                 )
-                last_alert = level
+
+            # 🔽 Cruzou 70 para baixo
+            if previous_rsi > 70 and rsi <= 70:
+                send_telegram_message(
+                    f"⚠ BTCUSDT saiu da sobrecompra\nRSI caiu abaixo de 70\nAtual: {round(rsi,2)}"
+                )
+
+            # 🔽 Cruzou 30 para baixo
+            if previous_rsi > 30 and rsi <= 30:
+                send_telegram_message(
+                    f"🚨 BTCUSDT entrou em SOBREVENDA!\nRSI cruzou 30\nAtual: {round(rsi,2)}"
+                )
+
+            # 🔼 Cruzou 30 para cima
+            if previous_rsi < 30 and rsi >= 30:
+                send_telegram_message(
+                    f"⚠ BTCUSDT saiu da sobrevenda\nRSI subiu acima de 30\nAtual: {round(rsi,2)}"
+                )
+
+        previous_rsi = rsi
 
         time.sleep(60)
 
