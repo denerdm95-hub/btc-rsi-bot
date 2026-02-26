@@ -1,8 +1,10 @@
-print("BOT INICIADO")
+
 import requests
 import time
 import pandas as pd
 import numpy as np
+
+print("BOT INICIADO", flush=True)
 
 # CONFIGURAÇÕES
 TOKEN = "8772767472:AAGnnI0tiiHRCnWZvJQHadi8bXtNy64JPgU"
@@ -42,11 +44,13 @@ def calculate_rsi(closes, period=14):
 last_alert = None
 
 while True:
+  print("LOOP ATIVO", flush=True)   # 👈 COLOQUE AQUI
+
     try:
         closes = get_klines()
         rsi = calculate_rsi(closes, rsi_period)
 
-        print("RSI atual:", rsi)
+        print("RSI atual:", rsi, flush=True)
 
         levels = [25, 30, 70, 75]
 
