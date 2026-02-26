@@ -24,7 +24,7 @@ def send_telegram_message(message):
 
 
 def get_klines():
-    url = "https://api.binance.com/api/v3/klines"
+    url = "https://api.binance.us/api/v3/klines"
     params = {
         "symbol": symbol,  # CORRIGIDO AQUI
         "interval": interval,
