@@ -44,7 +44,7 @@ def calculate_rsi(closes, period=14):
 last_alert = None
 
 while True:
-  print("LOOP ATIVO", flush=True)   # 👈 COLOQUE AQUI
+    print("LOOP ATIVO", flush=True)   # 👈 COLOQUE AQUI
 
     try:
         closes = get_klines()
