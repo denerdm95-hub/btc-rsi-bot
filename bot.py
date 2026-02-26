@@ -6,8 +6,8 @@ import numpy as np
 print("BOT INICIADO", flush=True)
 
 # CONFIGURAÇÕES
-TOKEN = "SEU_TOKEN_AQUI"
-CHAT_ID = "SEU_CHAT_ID_AQUI"
+TOKEN = "8772767472:AAG4z2WVuZvTHRpSTqps9pplxZZpAm9DTuA"
+CHAT_ID = "8729665942"
 
 symbol = "BTCUSDT"
 interval = "4h"
